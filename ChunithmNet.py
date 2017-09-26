@@ -60,6 +60,14 @@ class ChunithmNet:
       res.close()
 
   def get_score(self):
+    """
+    自分のプレイデータ情報を取得する
+    my_records = {
+      ${music_id}_${difficulty_id}: { "music_id": 3, "music_name": "hoge", "difficulty_id": "3", "score": 1000 },
+      ${music_id}_${difficulty_id}: { "music_id": 3, "music_name": "bell", "difficulty_id": "3", "score": 1001000 }
+    }
+    のdict形式でmy_recordsを返す
+    """
     ## scoreとrecordが混ざっていることに違和感がないこともないけどきにしないことにする
 
     #self.login()

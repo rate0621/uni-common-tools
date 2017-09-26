@@ -33,6 +33,11 @@ class ScoreCalculator:
     return math.floor(rate * 100) / 100
 
   def create_baserate_list(self):
+    """
+    楽曲の譜面定数のリストを返すメソッド
+    ソース上、https://chuniviewer.net/api/GetMusicConstantValues.phpから取ってきているが、
+    ゆくゆくはapexに全データを投入し（逐次される仕組みも作る）そこから引っ張るようにする
+    """
     with urllib.request.urlopen("https://chuniviewer.net/api/GetMusicConstantValues.php") as res:
       html = res.read().decode("utf-8")
       ratelist_json = json.loads(html)
@@ -117,17 +122,18 @@ class ScoreCalculator:
     return math.floor(average * 100) / 100
     
   def get_best_music_list(self):
+    """
+    NETから抜いてきた自分のスコアを元にベスト枠の曲を抽出する
+    """
     score = self.cn.get_score_only()
-
     return score
     
 if __name__ == '__main__':
   args = sys.argv
   sc = ScoreCalculator(args[1], args[2])
   baserate_list = sc.create_baserate_list()
-  print (sc.get_best_music_list())
 
-  #cn = ChunithmNet.ChunithmNet(args[1], args[2])
+  print (sc.get_best_music_list())
 
   # TODO:scoreとplaylogはselfで持たせたほうがいい気がする
   #score = cn.get_score_only()
