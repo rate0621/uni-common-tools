@@ -3,7 +3,12 @@ import urllib.request
 import json
 import math
 import pandas as pd
+import os
 
+# 単体で実行する文にはappendは不要だが、bottleから動かす場合、実行ディレクトリが一個上のため、
+# ChunithmNet のインポートで怒られたため以下の2行を追加してインポートした
+here = os.path.join( os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(here)
 import ChunithmNet
 
 
