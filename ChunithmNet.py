@@ -172,6 +172,9 @@ class ChunithmNet:
 
     soup = BeautifulSoup(html, "html.parser")
     detail = {
+      "play_date"        : soup.find(class_="box_inner01").text,
+      "music_title"      : soup.find(class_="play_musicdata_title").text,
+      "score"            : soup.find(class_="play_musicdata_score_text").text.replace('Score：', ''),
       "max_combo"        : soup.find(class_="play_musicdata_max_number").text,
       "justice_critical" : soup.find(class_="play_musicdata_judgenumber text_critical").text,
       "justice"          : soup.find(class_="play_musicdata_judgenumber text_justice").text,
@@ -295,5 +298,5 @@ class ChunithmNet:
 if __name__ == '__main__':
   args = sys.argv
   cn = ChunithmNet(args[1], args[2])
-  cn.get_playlog_detail(0)
+  print (cn.get_playlog_detail(0))
   #print (cn.get_playlog())
