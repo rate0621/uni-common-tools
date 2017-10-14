@@ -151,6 +151,35 @@ class ChunithmNet:
 
     return playlogs
 
+  def get_playlog_detail(self, num):
+    """
+    プレイ履歴から更に詳細情報取得
+    @param num(int)
+    @return detail(dict)
+    """
+    playlog_detail_url = "https://chunithm-net.com/mobile/Playlog.html"
+    post_data = {
+      'nextPage': "PlaylogDetail",
+      'args': num,
+      'pageMove': "pageMove"
+    }
+    data = urllib.parse.urlencode(post_data).encode("utf-8")
+
+    req = urllib.request.Request(playlog_detail_url, None, self.headers)
+    with urllib.request.urlopen(req, data=data) as res:
+      html = res.read().decode("utf-8")
+      res.close()
+
+    soup = BeautifulSoup(html, "html.parser")
+    detail = {
+      "max_combo"        : soup.find(class_="play_musicdata_max_number").text,
+      "justice_critical" : soup.find(class_="play_musicdata_judgenumber text_critical").text,
+      "justice"          : soup.find(class_="play_musicdata_judgenumber text_justice").text,
+      "attack"           : soup.find(class_="play_musicdata_judgenumber text_attack").text,
+      "miss"             : soup.find(class_="play_musicdata_judgenumber text_miss").text
+    }
+    
+    return detail
 
   def get_score_only(self):
     score_data = self.get_score()
@@ -266,4 +295,5 @@ class ChunithmNet:
 if __name__ == '__main__':
   args = sys.argv
   cn = ChunithmNet(args[1], args[2])
-  print (cn.get_playlog())
+  cn.get_playlog_detail(0)
+  #print (cn.get_playlog())
