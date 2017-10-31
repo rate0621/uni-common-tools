@@ -3,7 +3,8 @@ uni-common-tools
 
 ## 下記ツールたちが利用する共通のライブラリ
 
-* uni-bot
+* bot-on-twitter
+* bot-on-line
 * uni-calc-rater
 
 ## 使い方
