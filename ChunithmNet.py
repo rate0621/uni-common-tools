@@ -4,6 +4,7 @@ import http.cookiejar
 import sys, os
 from bs4 import BeautifulSoup
 import re, pprint
+import math
 
 import json
 import pandas as pd
@@ -234,11 +235,15 @@ class ChunithmNet:
       if score[key]["score"] == 0:
         print (score[key]["music_name"] + " is not play...")
       else:
-        if self.baserate_list[key]["value"] == None:
-          print ("Sorry, " + score[key]["music_name"] + " baserate is None.")
+        if key in self.baserate_list.keys():
+          if self.baserate_list[key]["value"] == None:
+            print ("Sorry, " + score[key]["music_name"] + " baserate is None.")
+          else:
+            rate = self.score_to_rate(int(score[key]["score"].replace(',', '')), self.baserate_list[key]["value"])
+            score[key]["rate"] = rate
         else:
-          rate = self.score_to_rate(int(score[key]["score"].replace(',', '')), self.baserate_list[key]["value"])
-          score[key]["rate"] = rate
+          print ("Sorry, " + score[key]["music_name"] + " baserate is None.")
+ 
 
 
     ### recent枠の対象曲の算出は現状まだロジックがわかっていないため廃止（単純に上位の曲を持ってくるわけではない模様）
@@ -292,11 +297,13 @@ class ChunithmNet:
     """
     NETから抜いてきた自分のスコアを元にベスト枠の曲を抽出する
     """
-    score = self.get_score_only()
-    return score
+    score     = self.get_score_only()
+    score     = self.calc_rate(score)
+    best_rate = self.calc_finally_rate(score)
+    return best_rate
 
 if __name__ == '__main__':
   args = sys.argv
   cn = ChunithmNet(args[1], args[2])
-  print (cn.get_playlog_detail(0))
+  print (cn.get_best_music_list())
   #print (cn.get_playlog())
