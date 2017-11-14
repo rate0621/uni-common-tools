@@ -226,7 +226,7 @@ class ChunithmNet:
 
   def calc_rate(self, score):
     """
-    scoreにrateを追加する
+    自分のscoreをもとにrateを追加する
     """
 
     #まずbest枠のrateを算出する
@@ -293,11 +293,11 @@ class ChunithmNet:
 
     return math.floor(average * 100) / 100
 
-  def get_best_music_list(self):
+  def get_my_best_rate(self):
     """
-    NETから抜いてきた自分のスコアを元にベスト枠の曲を抽出する
+    自分のベストのレート値を返す
     """
-    score     = self.get_score_only()
+    score     = self.get_score()
     score     = self.calc_rate(score)
     best_rate = self.calc_finally_rate(score)
     return best_rate
@@ -305,5 +305,5 @@ class ChunithmNet:
 if __name__ == '__main__':
   args = sys.argv
   cn = ChunithmNet(args[1], args[2])
-  print (cn.get_best_music_list())
+  print (cn.get_my_best_rate())
   #print (cn.get_playlog())
