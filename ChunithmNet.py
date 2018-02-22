@@ -158,6 +158,7 @@ class ChunithmNet:
     @param num(int)
     @return detail(dict)
     """
+    base_url           = "https://chunithm-net.com/mobile/"
     playlog_detail_url = "https://chunithm-net.com/mobile/Playlog.html"
     post_data = {
       'nextPage': "PlaylogDetail",
@@ -180,7 +181,8 @@ class ChunithmNet:
       "justice_critical" : soup.find(class_="play_musicdata_judgenumber text_critical").text,
       "justice"          : soup.find(class_="play_musicdata_judgenumber text_justice").text,
       "attack"           : soup.find(class_="play_musicdata_judgenumber text_attack").text,
-      "miss"             : soup.find(class_="play_musicdata_judgenumber text_miss").text
+      "miss"             : soup.find(class_="play_musicdata_judgenumber text_miss").text,
+      "play_jacket_img"  : base_url + soup.find(class_="play_jacket_img").img['src']
     }
     
     return detail
@@ -305,5 +307,4 @@ class ChunithmNet:
 if __name__ == '__main__':
   args = sys.argv
   cn = ChunithmNet(args[1], args[2])
-  print (cn.get_my_best_rate())
-  #print (cn.get_playlog())
+  datail = cn.get_playlog_detail(1)
