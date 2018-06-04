@@ -5,6 +5,8 @@ import sys, os
 from bs4 import BeautifulSoup
 import re, pprint
 import math
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 import json
 import pandas as pd
