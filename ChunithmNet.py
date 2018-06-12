@@ -321,7 +321,7 @@ class ChunithmNet:
 
   def get_my_best(self):
     """
-    自分のベストのレート値を返す
+    自分のベスト枠の曲一覧を返す
     """
     score      = self.get_score()
     score      = self.calc_rate(score)
@@ -329,8 +329,34 @@ class ChunithmNet:
 
     return best_array
 
+  def get_my_best_rate(self):
+    """
+    自分のベストレートの値を返す
+    """
+    best_array = self.get_my_best()
+
+    rate_array = []
+    for best in best_array:
+      rate_array.append(best['rate'])
+    average = sum(rate_array)/len(rate_array)
+    return math.floor(average * 100) / 100
+
+  def get_my_best_music_list(self):
+    """
+    自分のベスト枠の曲一覧を返す
+    """
+    best_array = self.get_my_best()
+    music_array = []
+    for best in best_array:
+      music_array.append(best['music_name'] + ' ' + str(best['rate']))
+
+    return music_array
+
 if __name__ == '__main__':
   args = sys.argv
   cn = ChunithmNet(args[1], args[2])
   #datail = cn.get_playlog_detail(1)
-  best_array = cn.get_my_best()
+  #best_array = cn.get_my_best()
+  best_music = cn.get_my_best_music_list()
+  print ("\n".join(best_music))
+  
