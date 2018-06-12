@@ -8,7 +8,7 @@ uni-common-tools
 * uni-calc-rater
 
 ## 使い方
-それぞれのツールにsubtreeとして追加する想定
+それぞれのツールのsubmoduleとして使う
 
 ### clone時の注意
 
@@ -24,3 +24,4 @@ Simple-AES-Cipher==1.0.6
 six==1.11.0
 wheel==0.25.0
 ```
+

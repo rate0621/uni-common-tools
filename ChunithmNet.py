@@ -5,6 +5,8 @@ import sys, os
 from bs4 import BeautifulSoup
 import re, pprint
 import math
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 import json
 import pandas as pd
@@ -37,7 +39,24 @@ class ChunithmNet:
 
       req = urllib.request.Request(aime_url, None, self.headers)
       with urllib.request.urlopen(req, data=data) as res:
+        html = res.read().decode("utf-8")
         res.close()
+
+      # ログインついでに自身の現在のレートと最大レートを取得しておく
+      soup = BeautifulSoup(html, "html.parser")
+
+      # "14.34 / (MAX 14.40)" という形でnow_rate_and_max_rateに入る
+      now_rate_and_max_rate = soup.find(class_="player_rating").text.replace('RATING :', '').strip()
+
+      # 数字の部分だけ抜き出す
+      pattern = "(\d+\.\d+)?"
+      rate_list = re.findall(pattern, now_rate_and_max_rate)
+
+      # なぜか空白文字列がrate_listに入ってしまうため、空の部分を除去(リスト内包表記という技らしい)
+      rate_list = [i for i in rate_list if i != '']
+      self.now_rate = rate_list[0]
+      self.max_rate = rate_list[1]
+
 
     def __create_baserate_list():
       """
@@ -158,6 +177,7 @@ class ChunithmNet:
     @param num(int)
     @return detail(dict)
     """
+    base_url           = "https://chunithm-net.com/mobile/"
     playlog_detail_url = "https://chunithm-net.com/mobile/Playlog.html"
     post_data = {
       'nextPage': "PlaylogDetail",
@@ -180,7 +200,9 @@ class ChunithmNet:
       "justice_critical" : soup.find(class_="play_musicdata_judgenumber text_critical").text,
       "justice"          : soup.find(class_="play_musicdata_judgenumber text_justice").text,
       "attack"           : soup.find(class_="play_musicdata_judgenumber text_attack").text,
-      "miss"             : soup.find(class_="play_musicdata_judgenumber text_miss").text
+      "miss"             : soup.find(class_="play_musicdata_judgenumber text_miss").text,
+      "is_newrecord"     : soup.find(class_="play_musicdata_score_img"),
+      "play_jacket_img"  : base_url + soup.find(class_="play_jacket_img").img['src']
     }
     
     return detail
@@ -233,16 +255,19 @@ class ChunithmNet:
     for key in score:
       score[key]["rate"] = 0
       if score[key]["score"] == 0:
-        print (score[key]["music_name"] + " is not play...")
+        #print (score[key]["music_name"] + " is not play...")
+        continue
       else:
         if key in self.baserate_list.keys():
           if self.baserate_list[key]["value"] == None:
-            print ("Sorry, " + score[key]["music_name"] + " baserate is None.")
+            #print ("Sorry, " + score[key]["music_name"] + " baserate is None.")
+            continue
           else:
             rate = self.score_to_rate(int(score[key]["score"].replace(',', '')), self.baserate_list[key]["value"])
             score[key]["rate"] = rate
         else:
-          print ("Sorry, " + score[key]["music_name"] + " baserate is None.")
+          #print ("Sorry, " + score[key]["music_name"] + " baserate is None.")
+          continue
  
 
 
@@ -269,16 +294,16 @@ class ChunithmNet:
   def calc_finally_rate(self, score):
     """
     与えられた変数score, playlogから算出した平均値を返す
-    score -> best枠として上位20位の楽曲
+    score -> best枠として上位30位の楽曲
     playlog -> recent枠として上位10位の楽曲
 
     best、recentの30曲のrateの平均値がrateとなる。
     """
 
     best_music_limit = 30
-    rate_array = []
+    best_array = []
     for i, key in enumerate(sorted(score, key=lambda x:score[x]["rate"], reverse=True)):
-      rate_array.append(score[key]["rate"])
+      best_array.append(score[key])
       if i == best_music_limit - 1:
         break
 
@@ -289,21 +314,23 @@ class ChunithmNet:
     #  if i == recent_music_limit - 1:
     #    break
 
-    average = sum(rate_array)/len(rate_array)
+    #average = sum(rate_array)/len(rate_array)
 
-    return math.floor(average * 100) / 100
+    return best_array
+    #return math.floor(average * 100) / 100
 
-  def get_my_best_rate(self):
+  def get_my_best(self):
     """
     自分のベストのレート値を返す
     """
-    score     = self.get_score()
-    score     = self.calc_rate(score)
-    best_rate = self.calc_finally_rate(score)
-    return best_rate
+    score      = self.get_score()
+    score      = self.calc_rate(score)
+    best_array = self.calc_finally_rate(score)
+
+    return best_array
 
 if __name__ == '__main__':
   args = sys.argv
   cn = ChunithmNet(args[1], args[2])
-  print (cn.get_my_best_rate())
-  #print (cn.get_playlog())
+  #datail = cn.get_playlog_detail(1)
+  best_array = cn.get_my_best()
