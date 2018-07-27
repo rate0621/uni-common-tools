@@ -64,7 +64,7 @@ class ChunithmNet:
       TODO: ソース上、https://chuniviewer.net/api/GetMusicConstantValues.phpから取ってきているが、
       ゆくゆくはapexに全データを投入し（逐次される仕組みも作る）そこから引っ張るようにする
       """
-      with urllib.request.urlopen("https://chuniviewer.net/api/GetMusicConstantValues.php") as res:
+      with urllib.request.urlopen("https://chuniviewer.net/GetMusicConstantValues.php") as res:
         html = res.read().decode("utf-8")
         ratelist_json = json.loads(html)
 
